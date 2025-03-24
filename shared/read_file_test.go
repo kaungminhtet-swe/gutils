@@ -1,11 +1,11 @@
 package shared
 
 import (
-	`github.com/stretchr/testify/assert`
-	`os`
-	`path`
-	`strings`
-	`testing`
+	"github.com/stretchr/testify/assert"
+	"os"
+	"path"
+	"strings"
+	"testing"
 )
 
 func TestReadFile(t *testing.T) {

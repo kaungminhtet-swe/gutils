@@ -1,15 +1,37 @@
-package wc_test
+package wc
 
 import (
-	`github.com/kaungminhtet-swe/gutils/shared`
-	`github.com/kaungminhtet-swe/gutils/wc`
-	`github.com/stretchr/testify/assert`
-	`io`
-	`os`
-	`path`
-	`strings`
+	`fmt`
+	"github.com/kaungminhtet-swe/gutils/shared"
+	"github.com/stretchr/testify/assert"
+	"io"
+	`log/slog`
+	"os"
+	"path"
+	`path/filepath`
+	"strings"
 	"testing"
 )
+
+var file *os.File
+
+func TestMain(m *testing.M) {
+	// Get data file path
+	cd, _ := os.Getwd()
+	splitcd := strings.Split(cd, "/")
+	rootpath := strings.Join(splitcd[:len(splitcd)-1], "/")
+	filepath := path.Join(rootpath, "test/data/test.txt")
+
+	file, _ = shared.OpenFile(filepath)
+
+	code := m.Run()
+
+	if err := file.Close(); err != nil {
+		slog.Error("Error found in closing file", file.Name(), err.Error())
+	}
+
+	os.Exit(code)
+}
 
 func Test_Count_Lines(t *testing.T) {
 	testcases := []struct {
@@ -48,7 +70,7 @@ Hello, World!`),
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual, err := wc.CountLines(tc.input)
+			actual, err := countLines(tc.input)
 			assert.Equal(t, tc.expected, actual)
 
 			if tc.err == "" {
@@ -61,23 +83,18 @@ Hello, World!`),
 }
 
 func TestCountLinesFromFile(t *testing.T) {
-	// Get project root directory
-	cd, err := os.Getwd()
-	assert.Nil(t, err, err)
+	actual := countLinesFromFiles([]*os.File{file})
+	assert.Equal(t, []int64{7145}, actual)
+}
+
+func TestCountLines(t *testing.T) {
+	cd, _ := os.Getwd()
 	splitcd := strings.Split(cd, "/")
 	rootpath := strings.Join(splitcd[:len(splitcd)-1], "/")
+	testpath := path.Join(rootpath, "test/data/test.txt")
 
-	filepath := path.Join(rootpath, "test/data/test.txt")
-	assert.FileExists(t, filepath)
+	lines := CountLines(testpath)
 
-	file, err := shared.OpenFile(filepath)
-	assert.Nil(t, err)
-	assert.NotNil(t, file)
-	if file != nil {
-		defer file.Close()
-	}
-
-	actual, err := wc.CountLines(file)
-	assert.Nil(t, err)
-	assert.Equal(t, int64(7145), actual)
+	assert.Equal(t, fmt.Sprintf("%d lines %s\n", 7145,
+		filepath.Base(testpath)), lines)
 }

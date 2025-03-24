@@ -1,10 +1,10 @@
 package shared
 
 import (
-	`errors`
-	`fmt`
-	`io/fs`
-	`os`
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
 )
 
 func OpenFile(filepath string) (*os.File, error) {
