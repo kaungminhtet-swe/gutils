@@ -1,9 +1,12 @@
 package wc_test
 
 import (
+	`github.com/kaungminhtet-swe/gutils/shared`
 	`github.com/kaungminhtet-swe/gutils/wc`
 	`github.com/stretchr/testify/assert`
 	`io`
+	`os`
+	`path`
 	`strings`
 	"testing"
 )
@@ -55,4 +58,26 @@ Hello, World!`),
 			}
 		})
 	}
+}
+
+func TestCountLinesFromFile(t *testing.T) {
+	// Get project root directory
+	cd, err := os.Getwd()
+	assert.Nil(t, err, err)
+	splitcd := strings.Split(cd, "/")
+	rootpath := strings.Join(splitcd[:len(splitcd)-1], "/")
+
+	filepath := path.Join(rootpath, "test/data/test.txt")
+	assert.FileExists(t, filepath)
+
+	file, err := shared.ReadFile(filepath)
+	assert.Nil(t, err)
+	assert.NotNil(t, file)
+	if file != nil {
+		defer file.Close()
+	}
+
+	actual, err := wc.CountLines(file)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(7145), actual)
 }

@@ -29,5 +29,7 @@ func TestReadFile(t *testing.T) {
 		file, err := ReadFile(filepath)
 		assert.NotNil(t, file)
 		assert.Nil(t, err)
+
+		file.Close()
 	})
 }
