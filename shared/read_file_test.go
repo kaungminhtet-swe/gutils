@@ -10,7 +10,7 @@ import (
 
 func TestReadFile(t *testing.T) {
 	t.Run("invalid file path", func(t *testing.T) {
-		file, err := ReadFile("./test/data/test.txt")
+		file, err := OpenFile("./test/data/test.txt")
 		assert.Nil(t, file)
 		assert.NotNil(t, err)
 		assert.EqualError(t, err, "file does not exist")
@@ -26,7 +26,7 @@ func TestReadFile(t *testing.T) {
 		filepath := path.Join(rootpath, "test/data/test.txt")
 		assert.FileExists(t, filepath)
 
-		file, err := ReadFile(filepath)
+		file, err := OpenFile(filepath)
 		assert.NotNil(t, file)
 		assert.Nil(t, err)
 

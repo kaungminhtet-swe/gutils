@@ -70,7 +70,7 @@ func TestCountLinesFromFile(t *testing.T) {
 	filepath := path.Join(rootpath, "test/data/test.txt")
 	assert.FileExists(t, filepath)
 
-	file, err := shared.ReadFile(filepath)
+	file, err := shared.OpenFile(filepath)
 	assert.Nil(t, err)
 	assert.NotNil(t, file)
 	if file != nil {

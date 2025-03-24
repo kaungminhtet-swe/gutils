@@ -7,7 +7,7 @@ import (
 	`os`
 )
 
-func ReadFile(filepath string) (*os.File, error) {
+func OpenFile(filepath string) (*os.File, error) {
 	file, err := os.OpenFile(filepath, os.O_RDONLY, 0444)
 
 	if errors.Is(err, fs.ErrNotExist) {
