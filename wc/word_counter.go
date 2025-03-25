@@ -12,6 +12,38 @@ import (
 	"path/filepath"
 )
 
+const (
+	Line = iota
+	Word
+)
+
+func Run(flag int, filepaths ...string) string {
+	if len(filepaths) == 0 {
+		log.Fatalf("empty files")
+	}
+
+	files, err := shared.OpenFiles(filepaths...)
+	if err != nil || len(files) == 0 {
+		log.Fatalf("can't read all files")
+	}
+	defer func() {
+		for _, file := range files {
+			if err := file.Close(); err != nil {
+				slog.Error("Error found in closing file", file.Name(), err.Error())
+			}
+		}
+	}()
+
+	switch flag {
+	case Line:
+		return countLinesFromFiles(files...)
+	case Word:
+		return countWordsFromFiles(files...)
+	default:
+		return ""
+	}
+}
+
 func countLines(rd io.Reader) (int64, error) {
 	if rd == nil {
 		return 0, errors.New("nil reader")
@@ -33,8 +65,8 @@ func countLines(rd io.Reader) (int64, error) {
 	}
 }
 
-func countLinesFromFiles(files []*os.File) []int64 {
-	var results = make([]int64, len(files))
+func countLinesFromFiles(files ...*os.File) string {
+	var results = ""
 
 	for i, file := range files {
 		lines, err := countLines(file)
@@ -42,35 +74,7 @@ func countLinesFromFiles(files []*os.File) []int64 {
 			slog.Error("Skipped: ", file.Name(), err.Error())
 			continue
 		}
-		results[i] = lines
-	}
-
-	return results
-}
-
-func CountLines(filepaths ...string) string {
-	if len(filepaths) == 0 {
-		log.Fatalf("empty files")
-	}
-
-	files, err := shared.OpenFiles(filepaths...)
-	if err != nil || len(files) == 0 {
-		log.Fatalf("can't read all files")
-	}
-	defer func() {
-		for _, file := range files {
-			if err := file.Close(); err != nil {
-				slog.Error("Error found in closing file", file.Name(), err.Error())
-			}
-			slog.Info("File is closed", "file", filepath.Base(file.Name()))
-		}
-	}()
-
-	lineCounts := countLinesFromFiles(files)
-
-	var results string
-	for i, lineCount := range lineCounts {
-		results += fmt.Sprintf("%d lines %s\n", lineCount,
+		results += fmt.Sprintf("%d lines %s\n", lines,
 			filepath.Base(files[i].Name()))
 	}
 
@@ -93,24 +97,7 @@ func countWords(rd io.Reader) (int64, error) {
 	return wordCount, nil
 }
 
-func CountWords(filepaths ...string) string {
-	if len(filepaths) == 0 {
-		log.Fatalf("empty files")
-	}
-
-	files, err := shared.OpenFiles(filepaths...)
-	if err != nil || len(files) == 0 {
-		log.Fatalf("can't read all files")
-	}
-	defer func() {
-		for _, file := range files {
-			if err := file.Close(); err != nil {
-				slog.Error("Error found in closing file", file.Name(), err.Error())
-			}
-			slog.Info("File is closed", "file", filepath.Base(file.Name()))
-		}
-	}()
-
+func countWordsFromFiles(files ...*os.File) string {
 	results := ""
 	for _, file := range files {
 		words, err := countWords(file)

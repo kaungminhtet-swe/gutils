@@ -3,7 +3,7 @@ package shared
 import (
 	"log/slog"
 	"os"
-	`path/filepath`
+	"path/filepath"
 )
 
 func OpenFiles(filepaths ...string) ([]*os.File, error) {
