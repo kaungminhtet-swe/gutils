@@ -1,14 +1,14 @@
 package wc
 
 import (
-	`fmt`
+	"fmt"
 	"github.com/kaungminhtet-swe/gutils/shared"
 	"github.com/stretchr/testify/assert"
 	"io"
-	`log/slog`
+	"log/slog"
 	"os"
 	"path"
-	`path/filepath`
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -97,4 +97,15 @@ func TestCountLines(t *testing.T) {
 
 	assert.Equal(t, fmt.Sprintf("%d lines %s\n", 7145,
 		filepath.Base(testpath)), lines)
+}
+
+func TestCountWords(t *testing.T) {
+	cd, _ := os.Getwd()
+	splitcd := strings.Split(cd, "/")
+	rootpath := strings.Join(splitcd[:len(splitcd)-1], "/")
+
+	testpath := path.Join(rootpath, "test/data/test.txt")
+	words := CountWords(testpath)
+	assert.Equal(t, fmt.Sprintf("%d words %s\n", 58164,
+		filepath.Base(testpath)), words)
 }
